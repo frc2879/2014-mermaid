@@ -8,7 +8,10 @@
 package com.frc2879.bender;
 
 
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SimpleRobot;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -18,6 +21,11 @@ import edu.wpi.first.wpilibj.SimpleRobot;
  * directory.
  */
 public class Robot extends SimpleRobot {
+    
+    RobotDrive drivetrain = new RobotDrive(1,2);
+    Joystick controllerthing = new Joystick(1);
+    
+    
     /**
      * This function is called once each time the robot enters autonomous mode.
      */
@@ -29,7 +37,11 @@ public class Robot extends SimpleRobot {
      * This function is called once each time the robot enters operator control.
      */
     public void operatorControl() {
-
+        drivetrain.setSafetyEnabled(true);
+        while (isOperatorControl() && isEnabled()) {
+            drivetrain.arcadeDrive(controllerthing);
+            Timer.delay(0.01);
+        }
     }
     
     /**
