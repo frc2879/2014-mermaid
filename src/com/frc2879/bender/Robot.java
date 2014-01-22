@@ -25,7 +25,30 @@ public class Robot extends SimpleRobot {
     RobotDrive drivetrain = new RobotDrive(1,2);
     Joystick controllerthing = new Joystick(1);
     
-    
+    // Defining Joystick Mappings:
+	public final int Button_X = 1;
+	public final int Button_Y = 4;
+	public final int Button_A = 2;
+	public final int Button_B = 3;
+	public final int Button_START = 10;
+	public final int Button_BACK = 9;
+	public final int Button_RIGHT_BUMPER = 6;
+	public final int Button_RIGHT_TRIGGER = 8;
+	public final int Button_LEFT_BUMPER = 5;
+	public final int Button_LEFT_TRIGGER = 7;
+	// Joystick axis(s)
+	public final int Stick_LEFT_Y = 2;
+	public final int Stick_LEFT_X = 1;
+	public final int Stick_RIGHT_X = 4; 
+	public final int Stick_RIGHT_Y = 5;
+	
+	// CONFIG VALUES ~~~~~~~~~
+	// ~~~~~~~~~~~~~~~~~~~~~~~
+	int HANDICAP = 1;
+	boolean SquaredInputs = true;
+	// ~~~~~~~~~~~~~~~~~~~~~~~
+	// CONFIG VALUES ~~~~~~~~~
+	
     /**
      * This function is called once each time the robot enters autonomous mode.
      */
@@ -39,7 +62,14 @@ public class Robot extends SimpleRobot {
     public void operatorControl() {
         drivetrain.setSafetyEnabled(true);
         while (isOperatorControl() && isEnabled()) {
-            drivetrain.arcadeDrive(controllerthing);
+		
+			// Update joystick values:
+			float moveL = ((controllerthing.GetRawAxis(Stick_LEFT_Y)) / HANDICAP);
+			float spinL = ((controllerthing.GetRawAxis(Stick_LEFT_X)) / HANDICAP);
+			
+			// Drive da robot:
+            drivetrain.arcadeDrive(moveL, spinL, SquaredInputs);
+			
             Timer.delay(0.01);
         }
     }
