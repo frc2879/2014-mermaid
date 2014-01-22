@@ -8,6 +8,7 @@
 package com.frc2879.bender;
 
 
+import edu.wpi.first.wpilibj.DriverStationLCD;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SimpleRobot;
@@ -48,19 +49,20 @@ public class Robot extends SimpleRobot {
 
 	// CONFIG VALUES ~~~~~~~~~
     // ~~~~~~~~~~~~~~~~~~~~~~~
-    double StickSensitivity = 1.25;
+    int StickSensitivity = 100;
     boolean SquaredInputs = true;
 	// ~~~~~~~~~~~~~~~~~~~~~~~
     // CONFIG VALUES ~~~~~~~~~
+    
+    DSOutput dsout;
+            
 
-    DStation dstation;
 
     //Called exactly 1 time when the competition starts.
     protected void robotInit() {
-        dstation = new DStation();
-        new Thread(dstation).start();
-        dstation.sendToLCD(fullname);
-        dstation.sendToLCD("Stick Sensitivity: " + StickSensitivity);
+        dsout = new DSOutput();
+        dsout.say(1, fullname);
+        saysticksensitivity();
     }
     
     boolean pbuttonRB = false;
@@ -82,6 +84,11 @@ public class Robot extends SimpleRobot {
 
     }
     
+    public void saysticksensitivity(){
+        dsout.clearLine(2);
+        dsout.say(2, "Stick Sensitivity: " + StickSensitivity);
+    }
+    
     
     
 
@@ -101,16 +108,17 @@ public class Robot extends SimpleRobot {
         while (isOperatorControl() && isEnabled()) {
 		
 	// Update joystick values:
-	double moveL = ((joystick.getRawAxis(Stick_LEFT_Y)) * StickSensitivity);
-	double spinL = ((joystick.getRawAxis(Stick_LEFT_X)) * StickSensitivity);
+	double moveL = ((joystick.getRawAxis(Stick_LEFT_Y)) * ((double)(StickSensitivity) / 100));
+	double spinL = ((joystick.getRawAxis(Stick_LEFT_X)) * ((double)(StickSensitivity) / 100));
         
         if(buttonpress(pbuttonRB, cbuttonRB, joystick.getRawButton(Button_RIGHT_BUMPER))){
-            StickSensitivity =  StickSensitivity + 0.1;
-            dstation.sendToLCD("Stick Sensitivity: " + StickSensitivity);
+            StickSensitivity =  (StickSensitivity) + (10);
+            saysticksensitivity();
         }
         if(buttonpress(pbuttonLB, cbuttonLB, joystick.getRawButton(Button_LEFT_BUMPER))){
-            StickSensitivity = StickSensitivity - 0.1;
-            dstation.sendToLCD("Stick Sensitivity: " + StickSensitivity);
+            StickSensitivity = (StickSensitivity) - (10);
+            saysticksensitivity();
+            
         }
         
         
