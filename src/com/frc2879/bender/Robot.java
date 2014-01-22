@@ -23,32 +23,69 @@ import edu.wpi.first.wpilibj.Timer;
 public class Robot extends SimpleRobot {
     
     RobotDrive drivetrain = new RobotDrive(1,2);
-    Joystick controllerthing = new Joystick(1);
+    Joystick joystick = new Joystick(1);
+    
+    public final String name = "Bender Robot Code";
+    public final double version = 1.01;
+    public final String fullname = name + " " + version;
     
     // Defining Joystick Mappings:
-	public final int Button_X = 1;
-	public final int Button_Y = 4;
-	public final int Button_A = 2;
-	public final int Button_B = 3;
-	public final int Button_START = 10;
-	public final int Button_BACK = 9;
-	public final int Button_RIGHT_BUMPER = 6;
-	public final int Button_RIGHT_TRIGGER = 8;
-	public final int Button_LEFT_BUMPER = 5;
-	public final int Button_LEFT_TRIGGER = 7;
-	// Joystick axis(s)
-	public final int Stick_LEFT_Y = 2;
-	public final int Stick_LEFT_X = 1;
-	public final int Stick_RIGHT_X = 4; 
-	public final int Stick_RIGHT_Y = 5;
-	
+    public final int Button_X = 1;
+    public final int Button_Y = 4;
+    public final int Button_A = 2;
+    public final int Button_B = 3;
+    public final int Button_START = 10;
+    public final int Button_BACK = 9;
+    public final int Button_RIGHT_BUMPER = 6;
+    public final int Button_RIGHT_TRIGGER = 8;
+    public final int Button_LEFT_BUMPER = 5;
+    public final int Button_LEFT_TRIGGER = 7;
+    // Joystick axis(s)
+    public final int Stick_LEFT_Y = 2;
+    public final int Stick_LEFT_X = 1;
+    public final int Stick_RIGHT_X = 4;
+    public final int Stick_RIGHT_Y = 5;
+
 	// CONFIG VALUES ~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~
+    double StickSensitivity = 1.25;
+    boolean SquaredInputs = true;
 	// ~~~~~~~~~~~~~~~~~~~~~~~
-	int HANDICAP = 1;
-	boolean SquaredInputs = true;
-	// ~~~~~~~~~~~~~~~~~~~~~~~
-	// CONFIG VALUES ~~~~~~~~~
-	
+    // CONFIG VALUES ~~~~~~~~~
+
+    DStation dstation;
+
+    //Called exactly 1 time when the competition starts.
+    protected void robotInit() {
+        dstation = new DStation();
+        new Thread(dstation).start();
+        dstation.sendToLCD(fullname);
+        dstation.sendToLCD("Stick Sensitivity: " + StickSensitivity);
+    }
+    
+    boolean pbuttonRB = false;
+    boolean cbuttonRB = false;
+    boolean pbuttonLB = false;
+    boolean cbuttonLB = false;
+       
+       
+    
+    boolean buttonpress(boolean pbutton, boolean cbutton, boolean button){
+       pbutton = cbutton;
+       cbutton = button;
+       
+       if(cbutton && !pbutton){
+           return true;
+       }else {
+           return false;
+       }
+
+    }
+    
+    
+    
+
+
     /**
      * This function is called once each time the robot enters autonomous mode.
      */
@@ -63,14 +100,26 @@ public class Robot extends SimpleRobot {
         drivetrain.setSafetyEnabled(true);
         while (isOperatorControl() && isEnabled()) {
 		
-			// Update joystick values:
-			float moveL = ((controllerthing.GetRawAxis(Stick_LEFT_Y)) / HANDICAP);
-			float spinL = ((controllerthing.GetRawAxis(Stick_LEFT_X)) / HANDICAP);
+	// Update joystick values:
+	double moveL = ((joystick.getRawAxis(Stick_LEFT_Y)) * StickSensitivity);
+	double spinL = ((joystick.getRawAxis(Stick_LEFT_X)) * StickSensitivity);
+        
+        if(buttonpress(pbuttonRB, cbuttonRB, joystick.getRawButton(Button_RIGHT_BUMPER))){
+            StickSensitivity =  StickSensitivity + 0.1;
+            dstation.sendToLCD("Stick Sensitivity: " + StickSensitivity);
+        }
+        if(buttonpress(pbuttonLB, cbuttonLB, joystick.getRawButton(Button_LEFT_BUMPER))){
+            StickSensitivity = StickSensitivity - 0.1;
+            dstation.sendToLCD("Stick Sensitivity: " + StickSensitivity);
+        }
+        
+        
+        
 			
 			// Drive da robot:
-            drivetrain.arcadeDrive(moveL, spinL, SquaredInputs);
+        drivetrain.arcadeDrive(moveL, spinL, SquaredInputs);
 			
-            Timer.delay(0.01);
+        Timer.delay(0.01);
         }
     }
     
