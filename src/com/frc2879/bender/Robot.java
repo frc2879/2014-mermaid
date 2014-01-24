@@ -24,7 +24,7 @@ public class Robot extends SimpleRobot {
     Joystick joystick = new Joystick(1);
 
     public final String name = "Bender Bot";
-    public final String version = "v1.03";
+    public final String version = "v1.04";
     public final String fullname = name + " " + version;
 
     // Defining Joystick Mappings:
@@ -44,12 +44,10 @@ public class Robot extends SimpleRobot {
     public final int Stick_RIGHT_X = 4;
     public final int Stick_RIGHT_Y = 5;
 
-    // CONFIG VALUES ~~~~~~~~~
-    // ~~~~~~~~~~~~~~~~~~~~~~~
+    // CONFIG VALUES
     int StickSensitivity = 100;
     boolean SquaredInputs = true;
-	// ~~~~~~~~~~~~~~~~~~~~~~~
-    // CONFIG VALUES ~~~~~~~~~
+
 
     DSOutput dsout;
 
