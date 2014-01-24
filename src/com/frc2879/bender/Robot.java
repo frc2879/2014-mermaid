@@ -26,8 +26,8 @@ public class Robot extends SimpleRobot {
     RobotDrive drivetrain = new RobotDrive(1,2);
     Joystick joystick = new Joystick(1);
     
-    public final String name = "Bender Robot Code";
-    public final double version = 1.01;
+    public final String name = "Bender Bot";
+    public final String version = "v1.03";
     public final String fullname = name + " " + version;
     
     // Defining Joystick Mappings:
@@ -66,27 +66,14 @@ public class Robot extends SimpleRobot {
     }
     
     boolean pbuttonRB = false;
-    boolean cbuttonRB = false;
     boolean pbuttonLB = false;
-    boolean cbuttonLB = false;
        
        
     
-    boolean buttonpress(boolean pbutton, boolean cbutton, boolean button){
-       pbutton = cbutton;
-       cbutton = button;
-       
-       if(cbutton && !pbutton){
-           return true;
-       }else {
-           return false;
-       }
-
-    }
     
     public void saysticksensitivity(){
         dsout.clearLine(2);
-        dsout.say(2, "Stick Sensitivity: " + StickSensitivity);
+        dsout.say(2, "Sensitivity: " + Integer.toString(StickSensitivity));
     }
     
     
@@ -111,14 +98,24 @@ public class Robot extends SimpleRobot {
 	double moveL = ((joystick.getRawAxis(Stick_LEFT_Y)) * ((double)(StickSensitivity) / 100));
 	double spinL = ((joystick.getRawAxis(Stick_LEFT_X)) * ((double)(StickSensitivity) / 100));
         
-        if(buttonpress(pbuttonRB, cbuttonRB, joystick.getRawButton(Button_RIGHT_BUMPER))){
+        //if(buttonpress(pbuttonRB, cbuttonRB, joystick.getRawButton(Button_RIGHT_BUMPER))){
+        //    StickSensitivity =  (StickSensitivity) + (10);
+        //    saysticksensitivity();
+       // }
+        
+        if (joystick.getRawButton(Button_RIGHT_BUMPER)) pbuttonRB = true;
+        else if(pbuttonRB && !joystick.getRawButton(Button_RIGHT_BUMPER)){
             StickSensitivity =  (StickSensitivity) + (10);
             saysticksensitivity();
+            pbuttonRB = false;
         }
-        if(buttonpress(pbuttonLB, cbuttonLB, joystick.getRawButton(Button_LEFT_BUMPER))){
-            StickSensitivity = (StickSensitivity) - (10);
+        
+        
+        if (joystick.getRawButton(Button_LEFT_BUMPER)) pbuttonLB = true;
+        else if(pbuttonLB && !joystick.getRawButton(Button_LEFT_BUMPER)){
+            StickSensitivity =  (StickSensitivity) - (10);
             saysticksensitivity();
-            
+            pbuttonLB = false;
         }
         
         
