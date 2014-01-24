@@ -24,7 +24,7 @@ public class Robot extends SimpleRobot {
     Joystick joystick = new Joystick(1);
 
     public final String name = "Bender Bot";
-    public final String version = "v1.04";
+    public final String version = "v1.05";
     public final String fullname = name + " " + version;
 
     // Defining Joystick Mappings:
@@ -56,14 +56,22 @@ public class Robot extends SimpleRobot {
         dsout = new DSOutput();
         dsout.say(1, fullname);
         saysticksensitivity();
+        saysquaredinputs();
     }
 
     boolean pbuttonRB = false;
     boolean pbuttonLB = false;
+    boolean pbuttonY = false;
+    
+
 
     public void saysticksensitivity() {
         dsout.clearLine(2);
         dsout.say(2, "Sensitivity: " + Integer.toString(StickSensitivity));
+    }
+    public void saysquaredinputs() {
+        dsout.clearLine(3);
+        dsout.say(3, "Squared Inputs: " + SquaredInputs);
     }
 
     /**
@@ -83,7 +91,7 @@ public class Robot extends SimpleRobot {
             // Update joystick values:
             double moveL = ((joystick.getRawAxis(Stick_LEFT_Y)) * ((double) (StickSensitivity) / 100));
             double spinL = ((joystick.getRawAxis(Stick_LEFT_X)) * ((double) (StickSensitivity) / 100));
-
+            
             if (joystick.getRawButton(Button_RIGHT_BUMPER)) {
                 pbuttonRB = true;
             } else if (pbuttonRB && !joystick.getRawButton(Button_RIGHT_BUMPER)) {
@@ -99,10 +107,20 @@ public class Robot extends SimpleRobot {
                 saysticksensitivity();
                 pbuttonLB = false;
             }
+            
+            if (joystick.getRawButton(Button_Y)) {
+                pbuttonY = true;
+            } else if (pbuttonY && !joystick.getRawButton(Button_Y)) {
+                SquaredInputs = !SquaredInputs;
+                saysquaredinputs();
+                pbuttonY = false;
+            }
+            
 
             // Drive da robot:
             drivetrain.arcadeDrive(moveL, spinL, SquaredInputs);
 
+            
             Timer.delay(0.01);
         }
     }
