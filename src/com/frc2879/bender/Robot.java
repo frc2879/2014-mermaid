@@ -4,11 +4,8 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
-
 package com.frc2879.bender;
 
-
-import edu.wpi.first.wpilibj.DriverStationLCD;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SimpleRobot;
@@ -22,14 +19,14 @@ import edu.wpi.first.wpilibj.Timer;
  * directory.
  */
 public class Robot extends SimpleRobot {
-    
-    RobotDrive drivetrain = new RobotDrive(1,2);
+
+    RobotDrive drivetrain = new RobotDrive(1, 2);
     Joystick joystick = new Joystick(1);
-    
+
     public final String name = "Bender Bot";
     public final String version = "v1.03";
     public final String fullname = name + " " + version;
-    
+
     // Defining Joystick Mappings:
     public final int Button_X = 1;
     public final int Button_Y = 4;
@@ -47,16 +44,14 @@ public class Robot extends SimpleRobot {
     public final int Stick_RIGHT_X = 4;
     public final int Stick_RIGHT_Y = 5;
 
-	// CONFIG VALUES ~~~~~~~~~
+    // CONFIG VALUES ~~~~~~~~~
     // ~~~~~~~~~~~~~~~~~~~~~~~
     int StickSensitivity = 100;
     boolean SquaredInputs = true;
 	// ~~~~~~~~~~~~~~~~~~~~~~~
     // CONFIG VALUES ~~~~~~~~~
-    
-    DSOutput dsout;
-            
 
+    DSOutput dsout;
 
     //Called exactly 1 time when the competition starts.
     protected void robotInit() {
@@ -64,27 +59,20 @@ public class Robot extends SimpleRobot {
         dsout.say(1, fullname);
         saysticksensitivity();
     }
-    
+
     boolean pbuttonRB = false;
     boolean pbuttonLB = false;
-       
-       
-    
-    
-    public void saysticksensitivity(){
+
+    public void saysticksensitivity() {
         dsout.clearLine(2);
         dsout.say(2, "Sensitivity: " + Integer.toString(StickSensitivity));
     }
-    
-    
-    
-
 
     /**
      * This function is called once each time the robot enters autonomous mode.
      */
     public void autonomous() {
-        
+
     }
 
     /**
@@ -93,45 +81,38 @@ public class Robot extends SimpleRobot {
     public void operatorControl() {
         drivetrain.setSafetyEnabled(true);
         while (isOperatorControl() && isEnabled()) {
-		
-	// Update joystick values:
-	double moveL = ((joystick.getRawAxis(Stick_LEFT_Y)) * ((double)(StickSensitivity) / 100));
-	double spinL = ((joystick.getRawAxis(Stick_LEFT_X)) * ((double)(StickSensitivity) / 100));
-        
-        //if(buttonpress(pbuttonRB, cbuttonRB, joystick.getRawButton(Button_RIGHT_BUMPER))){
-        //    StickSensitivity =  (StickSensitivity) + (10);
-        //    saysticksensitivity();
-       // }
-        
-        if (joystick.getRawButton(Button_RIGHT_BUMPER)) pbuttonRB = true;
-        else if(pbuttonRB && !joystick.getRawButton(Button_RIGHT_BUMPER)){
-            StickSensitivity =  (StickSensitivity) + (10);
-            saysticksensitivity();
-            pbuttonRB = false;
-        }
-        
-        
-        if (joystick.getRawButton(Button_LEFT_BUMPER)) pbuttonLB = true;
-        else if(pbuttonLB && !joystick.getRawButton(Button_LEFT_BUMPER)){
-            StickSensitivity =  (StickSensitivity) - (10);
-            saysticksensitivity();
-            pbuttonLB = false;
-        }
-        
-        
-        
-			
-			// Drive da robot:
-        drivetrain.arcadeDrive(moveL, spinL, SquaredInputs);
-			
-        Timer.delay(0.01);
+
+            // Update joystick values:
+            double moveL = ((joystick.getRawAxis(Stick_LEFT_Y)) * ((double) (StickSensitivity) / 100));
+            double spinL = ((joystick.getRawAxis(Stick_LEFT_X)) * ((double) (StickSensitivity) / 100));
+
+            if (joystick.getRawButton(Button_RIGHT_BUMPER)) {
+                pbuttonRB = true;
+            } else if (pbuttonRB && !joystick.getRawButton(Button_RIGHT_BUMPER)) {
+                StickSensitivity = (StickSensitivity) + (10);
+                saysticksensitivity();
+                pbuttonRB = false;
+            }
+
+            if (joystick.getRawButton(Button_LEFT_BUMPER)) {
+                pbuttonLB = true;
+            } else if (pbuttonLB && !joystick.getRawButton(Button_LEFT_BUMPER)) {
+                StickSensitivity = (StickSensitivity) - (10);
+                saysticksensitivity();
+                pbuttonLB = false;
+            }
+
+            // Drive da robot:
+            drivetrain.arcadeDrive(moveL, spinL, SquaredInputs);
+
+            Timer.delay(0.01);
         }
     }
-    
+
     /**
      * This function is called once each time the robot enters test mode.
      */
     public void test() {
-    
+
     }
 }
