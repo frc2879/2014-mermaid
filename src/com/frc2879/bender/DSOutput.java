@@ -9,10 +9,8 @@ import edu.wpi.first.wpilibj.DriverStationLCD;
 
 /**
  * Utilities for managing the Driver Station output window.
- * <p/>
- * @author Chris Cheng
- * @author Ben
- * @version 2011
+ *
+ * @author floogulinc
  */
 public class DSOutput {
 
@@ -31,11 +29,11 @@ public class DSOutput {
      * @param ln Which line to print in
      * @param msg What message to display
      */
-    public void say(int ln, String msg) {
+    public void sayNOCLEAR(int ln, String msg) {
         if (msg == null) {
             msg = "null message passed";
         }
-                // DriverStationLCD.kLineLength=21
+        // DriverStationLCD.kLineLength=21
         // Add 21 spaces to clear the rest of the line
         msg += "                     ";
         // If the given message is too long, truncate it
@@ -45,7 +43,7 @@ public class DSOutput {
 
         switch (ln) {
             case (1):
-                output.println(DriverStationLCD.Line.kMain6, 1, msg);
+                output.println(DriverStationLCD.Line.kUser1, 1, msg);
                 break;
             case (2):
                 output.println(DriverStationLCD.Line.kUser2, 1, msg);
@@ -63,7 +61,18 @@ public class DSOutput {
                 output.println(DriverStationLCD.Line.kUser6, 1, msg);
                 break;
         }
+
         // Show the message
+        output.updateLCD();
+    }
+
+    public void say(int ln, String msg) {
+        clearLine(ln);
+        sayNOCLEAR(ln, msg);
+    }
+
+    public void clearLine(int line) {
+        sayNOCLEAR(line, "                   ");
         output.updateLCD();
     }
 
@@ -71,18 +80,12 @@ public class DSOutput {
      * Clear the entire output box.
      */
     public void clearOutput() {
-        say(1, "                   ");
-        say(2, "                   ");
-        say(3, "                   ");
-        say(4, "                   ");
-        say(5, "                   ");
-        say(6, "                   ");
-        output.updateLCD();
+        clearLine(1);
+        clearLine(2);
+        clearLine(3);
+        clearLine(4);
+        clearLine(5);
+        clearLine(6);
     }
 
-    public void clearLine(int line) {
-        say(line, "                   ");
-        // Show the message
-        output.updateLCD();
-    }
 }

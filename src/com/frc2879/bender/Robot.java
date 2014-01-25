@@ -12,6 +12,10 @@ import edu.wpi.first.wpilibj.SimpleRobot;
 import edu.wpi.first.wpilibj.Timer;
 
 /**
+ *
+ * @author floogulinc
+ */
+/**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the SimpleRobot
  * documentation. If you change the name of this class or the package after
@@ -21,57 +25,57 @@ import edu.wpi.first.wpilibj.Timer;
 public class Robot extends SimpleRobot {
 
     RobotDrive drivetrain = new RobotDrive(1, 2);
-    Joystick joystick = new Joystick(1);
+    Gamepad gp = new Gamepad(1);
 
     public final String name = "Bender Bot";
-    public final String version = "v1.05";
+    public final String version = "v1.06";
     public final String fullname = name + " " + version;
 
-    // Defining Joystick Mappings:
-    public final int Button_X = 1;
-    public final int Button_Y = 4;
-    public final int Button_A = 2;
-    public final int Button_B = 3;
-    public final int Button_START = 10;
-    public final int Button_BACK = 9;
-    public final int Button_RIGHT_BUMPER = 6;
-    public final int Button_RIGHT_TRIGGER = 8;
-    public final int Button_LEFT_BUMPER = 5;
-    public final int Button_LEFT_TRIGGER = 7;
-    // Joystick axis(s)
-    public final int Stick_LEFT_Y = 2;
-    public final int Stick_LEFT_X = 1;
-    public final int Stick_RIGHT_X = 4;
-    public final int Stick_RIGHT_Y = 5;
-
     // CONFIG VALUES
-    int StickSensitivity = 100;
+    int DriveSensitivity = 100;
+    int TurnSensitivity = 100;
     boolean SquaredInputs = true;
-
 
     DSOutput dsout;
 
     //Called exactly 1 time when the competition starts.
     protected void robotInit() {
         dsout = new DSOutput();
-        dsout.say(1, fullname);
-        saysticksensitivity();
-        saysquaredinputs();
+        System.out.println("Loading " + fullname);
+        dsout.say(1, "Welcome to");
+        dsout.say(2, fullname);
+
     }
 
     boolean pbuttonRB = false;
     boolean pbuttonLB = false;
     boolean pbuttonY = false;
-    
+    boolean pbuttonX = false;
+    boolean pbuttonDPADL = false;
+    boolean pbuttonDPADR = false;
 
+    boolean bumpertoggle = false; //true is turn sensitivity, false for drive
 
-    public void saysticksensitivity() {
-        dsout.clearLine(2);
-        dsout.say(2, "Sensitivity: " + Integer.toString(StickSensitivity));
+    public void saydrivesensitivity() {
+        if (bumpertoggle) {
+            dsout.say(2, "DSensitivity: " + Integer.toString(DriveSensitivity));
+        } else {
+            dsout.say(2, "*DSensitivity: " + Integer.toString(DriveSensitivity));
+        }
+
     }
+
+    public void sayturnsensitivity() {
+        if (bumpertoggle) {
+            dsout.say(3, "*TSensitivity: " + Integer.toString(TurnSensitivity));
+        } else {
+            dsout.say(3, "TSensitivity: " + Integer.toString(TurnSensitivity));
+        }
+
+    }
+
     public void saysquaredinputs() {
-        dsout.clearLine(3);
-        dsout.say(3, "Squared Inputs: " + SquaredInputs);
+        dsout.say(4, "Squared Inputs: " + SquaredInputs);
     }
 
     /**
@@ -86,41 +90,63 @@ public class Robot extends SimpleRobot {
      */
     public void operatorControl() {
         drivetrain.setSafetyEnabled(true);
+        dsout.clearOutput();
+        dsout.say(1, fullname);
+        saydrivesensitivity();
+        sayturnsensitivity();
+        saysquaredinputs();
         while (isOperatorControl() && isEnabled()) {
 
             // Update joystick values:
-            double moveL = ((joystick.getRawAxis(Stick_LEFT_Y)) * ((double) (StickSensitivity) / 100));
-            double spinL = ((joystick.getRawAxis(Stick_LEFT_X)) * ((double) (StickSensitivity) / 100));
-            
-            if (joystick.getRawButton(Button_RIGHT_BUMPER)) {
+            double moveL = (gp.getLeftY() * ((double) (DriveSensitivity) / 100));
+            double spinL = (gp.getLeftX() * ((double) (TurnSensitivity) / 100));
+
+            if (gp.getButtonStateRightBumper()) {
                 pbuttonRB = true;
-            } else if (pbuttonRB && !joystick.getRawButton(Button_RIGHT_BUMPER)) {
-                StickSensitivity = (StickSensitivity) + (10);
-                saysticksensitivity();
+            } else if (pbuttonRB && !gp.getButtonStateRightBumper()) {
+                if (bumpertoggle) {
+                    TurnSensitivity = (TurnSensitivity) + (10);
+                    sayturnsensitivity();
+                } else {
+                    DriveSensitivity = (DriveSensitivity) + (10);
+                    saydrivesensitivity();
+                }
                 pbuttonRB = false;
             }
 
-            if (joystick.getRawButton(Button_LEFT_BUMPER)) {
+            if (gp.getButtonStateLeftBumper()) {
                 pbuttonLB = true;
-            } else if (pbuttonLB && !joystick.getRawButton(Button_LEFT_BUMPER)) {
-                StickSensitivity = (StickSensitivity) - (10);
-                saysticksensitivity();
+            } else if (pbuttonLB && !gp.getButtonStateLeftBumper()) {
+                if (bumpertoggle) {
+                    TurnSensitivity = (TurnSensitivity) - (10);
+                    sayturnsensitivity();
+                } else {
+                    DriveSensitivity = (DriveSensitivity) - (10);
+                    saydrivesensitivity();
+                }
                 pbuttonLB = false;
             }
-            
-            if (joystick.getRawButton(Button_Y)) {
+
+            if (gp.getButtonStateY()) {
                 pbuttonY = true;
-            } else if (pbuttonY && !joystick.getRawButton(Button_Y)) {
-                SquaredInputs = !SquaredInputs;
-                saysquaredinputs();
+            } else if (pbuttonY && !gp.getButtonStateY()) {
+                bumpertoggle = !bumpertoggle;
+                saydrivesensitivity();
+                sayturnsensitivity();
                 pbuttonY = false;
             }
-            
+
+            if (gp.getButtonStateX()) {
+                pbuttonX = true;
+            } else if (pbuttonX && !gp.getButtonStateX()) {
+                SquaredInputs = !SquaredInputs;
+                saysquaredinputs();
+                pbuttonX = false;
+            }
 
             // Drive da robot:
             drivetrain.arcadeDrive(moveL, spinL, SquaredInputs);
 
-            
             Timer.delay(0.01);
         }
     }
