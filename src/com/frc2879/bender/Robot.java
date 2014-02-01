@@ -28,7 +28,7 @@ public class Robot extends SimpleRobot {
     Gamepad gp = new Gamepad(1);
 
     public final String name = "Bender Bot";
-    public final String version = "v1.06";
+    public final String version = "v1.07";
     public final String fullname = name + " " + version;
 
     // CONFIG VALUES
@@ -82,7 +82,21 @@ public class Robot extends SimpleRobot {
      * This function is called once each time the robot enters autonomous mode.
      */
     public void autonomous() {
-
+        if (isAutonomous()) {
+            dsout.clearOutput();
+            dsout.say(1, fullname);
+            dsout.say(2, "Autonomous Mode");
+            Timer time = new Timer();
+            time.start();
+            while ( time.get() < 1 && isEnabled() && isAutonomous()) {
+                drivetrain.drive(-0.3, 0); //Negative goes forward for some reason
+                dsout.say(3, "Time: " + time.get());
+                Timer.delay(0.01);
+            }
+            time.stop();
+            dsout.say(3, "Time: " + time.get() + " DONE");
+            time.reset();
+        }
     }
 
     /**
@@ -149,7 +163,17 @@ public class Robot extends SimpleRobot {
 
             Timer.delay(0.01);
         }
+        
     }
+    
+    protected void disabled(){
+        if(isDisabled()){
+            dsout.clearOutput();
+            dsout.say(1, fullname);
+            dsout.say(2, "Robot Disabled");
+        }
+    }
+    
 
     /**
      * This function is called once each time the robot enters test mode.
