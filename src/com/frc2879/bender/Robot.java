@@ -6,10 +6,11 @@
 /*----------------------------------------------------------------------------*/
 package com.frc2879.bender;
 
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SimpleRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.camera.AxisCamera;
+import edu.wpi.first.wpilibj.camera.AxisCameraException;
 
 /**
  *
@@ -25,10 +26,11 @@ import edu.wpi.first.wpilibj.Timer;
 public class Robot extends SimpleRobot {
 
     RobotDrive drivetrain = new RobotDrive(1, 2);
-    Gamepad gp = new Gamepad(1);
+    //Gamepad gp = new Gamepad(1);
+    GamepadXbox gp = new GamepadXbox(1);
 
     public final String name = "Bender Bot";
-    public final String version = "v1.07";
+    public final String version = "v1.08";
     public final String fullname = name + " " + version;
 
     // CONFIG VALUES
@@ -37,11 +39,16 @@ public class Robot extends SimpleRobot {
     boolean SquaredInputs = true;
 
     DSOutput dsout;
+    
+    AxisCamera acam;
 
     //Called exactly 1 time when the competition starts.
     protected void robotInit() {
         dsout = new DSOutput();
         System.out.println("Loading " + fullname);
+        dsout.say(1, "Loading...");
+        Timer.delay(0.5);
+        acam = AxisCamera.getInstance("10.28.79.11");
         dsout.say(1, "Welcome to");
         dsout.say(2, fullname);
 
@@ -161,7 +168,7 @@ public class Robot extends SimpleRobot {
             // Drive da robot:
             drivetrain.arcadeDrive(moveL, spinL, SquaredInputs);
 
-            Timer.delay(0.01);
+            Timer.delay(0.005);
         }
         
     }
