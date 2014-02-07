@@ -94,6 +94,14 @@ public class GamepadXbox extends XboxController{
     public boolean getButtonStateY() {
         return getRawButton(Button_Y);
     }
+    
+    
+    public boolean getButtonStateSTART() {
+        return getRawButton(Button_START);
+    }
+    public boolean getButtonStateBACK() {
+        return getRawButton(Button_BACK);
+    }
 
     public boolean getButtonStateLeftBumper() {
         return getRawButton(Button_LEFT_BUMPER);

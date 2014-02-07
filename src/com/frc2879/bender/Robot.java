@@ -30,13 +30,15 @@ public class Robot extends SimpleRobot {
     GamepadXbox gp = new GamepadXbox(1);
 
     public final String name = "Bender Bot";
-    public final String version = "v1.08";
+    public final String version = "v1.09";
     public final String fullname = name + " " + version;
 
     // CONFIG VALUES
     int DriveSensitivity = 100;
     int TurnSensitivity = 100;
     boolean SquaredInputs = true;
+    
+    boolean sawyerdrive = false;
 
     DSOutput dsout;
     
@@ -46,6 +48,7 @@ public class Robot extends SimpleRobot {
     protected void robotInit() {
         dsout = new DSOutput();
         System.out.println("Loading " + fullname);
+        dsout.clearOutput();
         dsout.say(1, "Loading...");
         Timer.delay(0.5);
         acam = AxisCamera.getInstance("10.28.79.11");
@@ -60,6 +63,7 @@ public class Robot extends SimpleRobot {
     boolean pbuttonX = false;
     boolean pbuttonDPADL = false;
     boolean pbuttonDPADR = false;
+    boolean pbuttonBACK = false;
 
     boolean bumpertoggle = false; //true is turn sensitivity, false for drive
 
@@ -80,9 +84,13 @@ public class Robot extends SimpleRobot {
         }
 
     }
-
+    
     public void saysquaredinputs() {
         dsout.say(4, "Squared Inputs: " + SquaredInputs);
+    }
+
+    public void saysawyerdrive() {
+        dsout.say(5, "Sawyer Drive: " + sawyerdrive);
     }
 
     /**
@@ -116,11 +124,19 @@ public class Robot extends SimpleRobot {
         saydrivesensitivity();
         sayturnsensitivity();
         saysquaredinputs();
+        saysawyerdrive();
         while (isOperatorControl() && isEnabled()) {
 
             // Update joystick values:
-            double moveL = (gp.getLeftY() * ((double) (DriveSensitivity) / 100));
-            double spinL = (gp.getLeftX() * ((double) (TurnSensitivity) / 100));
+            double move;
+            double spin;
+            move = (gp.getLeftY() * ((double) (DriveSensitivity) / 100));
+            if(sawyerdrive) {
+                spin = (gp.getRightX() * ((double) (TurnSensitivity) / 100));
+            } else {
+                spin = (gp.getLeftX() * ((double) (TurnSensitivity) / 100));
+            }
+            
 
             if (gp.getButtonStateRightBumper()) {
                 pbuttonRB = true;
@@ -164,9 +180,16 @@ public class Robot extends SimpleRobot {
                 saysquaredinputs();
                 pbuttonX = false;
             }
+            if (gp.getButtonStateBACK()) {
+                pbuttonBACK = true;
+            } else if (pbuttonBACK && !gp.getButtonStateBACK()) {
+                sawyerdrive = !sawyerdrive;
+                saysawyerdrive();
+                pbuttonBACK = false;
+            }
 
             // Drive da robot:
-            drivetrain.arcadeDrive(moveL, spinL, SquaredInputs);
+            drivetrain.arcadeDrive(move, spin, SquaredInputs);
 
             Timer.delay(0.005);
         }
