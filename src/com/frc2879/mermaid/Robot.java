@@ -4,7 +4,7 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
-package com.frc2879.bender;
+package com.frc2879.mermaid;
 
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SimpleRobot;
@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.camera.AxisCamera;
  * @author floogulinc
  * 
  * Robot Code for FRC Team 2879 Orange Thunder
- * TEST BOT - Bender
+ * COMPETITION BOT - Mermaid
  */
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -31,8 +31,8 @@ public class Robot extends SimpleRobot {
     //Gamepad gp = new Gamepad(1);
     GamepadXbox gp = new GamepadXbox(1);
 
-    public static final String name = "Bender Bot";
-    public static final String version = "v1.11";
+    public static final String name = "Mermaid Bot";
+    public static final String version = "v1.00";
     public static final String fullname = name + " " + version;
 
     // CONFIG VALUES

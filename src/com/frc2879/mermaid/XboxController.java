@@ -1,4 +1,4 @@
-package com.frc2879.bender;
+package com.frc2879.mermaid;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
