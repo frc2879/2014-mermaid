@@ -6,8 +6,11 @@
 /*----------------------------------------------------------------------------*/
 package com.frc2879.mermaid;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SimpleRobot;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.camera.AxisCamera;
 
@@ -26,13 +29,17 @@ import edu.wpi.first.wpilibj.camera.AxisCamera;
  * directory.
  */
 public class Robot extends SimpleRobot {
+    
+    static final int driveR = 1;
+    static final int driveL = 2;
 
-    RobotDrive drivetrain = new RobotDrive(1, 2);
+    RobotDrive drivetrain = new RobotDrive(driveR, driveL);
     //Gamepad gp = new Gamepad(1);
-    GamepadXbox gp = new GamepadXbox(1);
+    static final int GPport = 1;
+    GamepadXbox gp = new GamepadXbox(GPport);
 
     public static final String name = "Mermaid Bot";
-    public static final String version = "v1.00";
+    public static final String version = "v1.01";
     public static final String fullname = name + " " + version;
 
     // CONFIG VALUES
@@ -46,17 +53,35 @@ public class Robot extends SimpleRobot {
     DSOutput dsout;
 
     AxisCamera acam;
+    static final String acamIP = "10.28.79.11";
 
+    static final int pressureSwitchChannel = 1;
+    static final int compressorRelayChannel = 4;
+    
+    static final int kickSolChanfor = 1;
+    static final int kickSolChanrev = 2;
+    static final int armsSolChanfor = 3;
+    static final int armsSolChanrev = 4;
+    
+    DoubleSolenoid kickSol = new DoubleSolenoid(kickSolChanfor, kickSolChanrev);
+    DoubleSolenoid armsSol = new DoubleSolenoid(armsSolChanfor, armsSolChanrev);
+    Compressor compressor = new Compressor(pressureSwitchChannel, compressorRelayChannel);
+
+            
     //Called exactly 1 time when the competition starts.
     protected void robotInit() {
         dsout = new DSOutput();
         System.out.println("Loading " + fullname);
         dsout.clearOutput();
         dsout.say(1, "Loading...");
+        dsout.say(2, "Compressor Starting");
+        compressor.start();
+        dsout.say(3, "Camera Starting");
         Timer.delay(1);
-        acam = AxisCamera.getInstance("10.28.79.11");
-        dsout.say(1, "Welcome to");
-        dsout.say(2, fullname);
+        acam = AxisCamera.getInstance(acamIP);
+        dsout.say(4, "Done.");
+        dsout.say(5, "Welcome to");
+        dsout.say(6, fullname);
 
     }
 
@@ -70,20 +95,12 @@ public class Robot extends SimpleRobot {
 
     boolean bumpertoggle = false; //true is turn sensitivity, false for drive
 
-    public void saydrivesensitivity(int line) {
-        if (bumpertoggle) {
-            dsout.say(line, "DSensitivity: " + Integer.toString(DriveSensitivity));
-        } else {
-            dsout.say(line, "*DSensitivity: " + Integer.toString(DriveSensitivity));
-        }
 
-    }
-
-    public void sayturnsensitivity(int line) {
+    public void saysensitivity(int line) {
         if (bumpertoggle) {
-            dsout.say(line, "*TSensitivity: " + Integer.toString(TurnSensitivity));
+            dsout.say(line, "*TS: " + Integer.toString(TurnSensitivity) + " | DS: " + Integer.toString(DriveSensitivity));
         } else {
-            dsout.say(line, "TSensitivity: " + Integer.toString(TurnSensitivity));
+            dsout.say(line, "TS: " + Integer.toString(TurnSensitivity) + " | *DS: " + Integer.toString(DriveSensitivity));
         }
 
     }
@@ -100,6 +117,10 @@ public class Robot extends SimpleRobot {
     public void saydrivemode(int line) {
         dsout.say(line, "Mode: " + drivemodename[DriveMode]);
     }
+    
+    public void saysolstates(int line){
+        dsout.say(line, "Kick: " + solvaluestring(kickSol.get()) + " | Arms: " + solvaluestring(armsSol.get()));
+    }
 
     public void sayscreentele() {
 
@@ -108,10 +129,23 @@ public class Robot extends SimpleRobot {
         saysquaredinputs(3);
         if (DriveMode == 1) {
             dsout.clearLine(4);
-            dsout.clearLine(5);
         } else {
-            saydrivesensitivity(4);
-            sayturnsensitivity(5);
+            saysensitivity(4);
+        }
+        saysolstates(5);
+        
+        
+    }
+    
+    public String solvaluestring(DoubleSolenoid.Value value) {
+        if(value.equals(DoubleSolenoid.Value.kOff)){
+            return "OFF";
+        } else if(value.equals(DoubleSolenoid.Value.kForward)) {
+            return "FOR";
+        } else if(value.equals(DoubleSolenoid.Value.kReverse)) {
+            return "REV";
+        } else {
+            return "null";
         }
     }
 
