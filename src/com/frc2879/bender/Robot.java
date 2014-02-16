@@ -12,8 +12,11 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.camera.AxisCamera;
 
 /**
- *
+ * 
  * @author floogulinc
+ * 
+ * Robot Code for FRC Team 2879 Orange Thunder
+ * TEST BOT - Bender
  */
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -29,19 +32,19 @@ public class Robot extends SimpleRobot {
     GamepadXbox gp = new GamepadXbox(1);
 
     public static final String name = "Bender Bot";
-    public static final String version = "v1.10";
+    public static final String version = "v1.11";
     public static final String fullname = name + " " + version;
 
     // CONFIG VALUES
     int DriveSensitivity = 100;
     int TurnSensitivity = 100;
     boolean SquaredInputs = true;
-    
+
     //boolean sawyerdrive = false;
     int DriveMode = 0; // 0 is arcade, 1 is tank, 2 is sawyer
 
     DSOutput dsout;
-    
+
     AxisCamera acam;
 
     //Called exactly 1 time when the competition starts.
@@ -50,20 +53,20 @@ public class Robot extends SimpleRobot {
         System.out.println("Loading " + fullname);
         dsout.clearOutput();
         dsout.say(1, "Loading...");
-        Timer.delay(0.5);
+        Timer.delay(1);
         acam = AxisCamera.getInstance("10.28.79.11");
         dsout.say(1, "Welcome to");
         dsout.say(2, fullname);
 
     }
 
-    boolean pbuttonRB = false;
-    boolean pbuttonLB = false;
-    boolean pbuttonY = false;
-    boolean pbuttonX = false;
-    boolean pbuttonDPADL = false;
-    boolean pbuttonDPADR = false;
-    boolean pbuttonBACK = false;
+    ButtonState pbuttonRB = new ButtonState(false);
+    ButtonState pbuttonLB = new ButtonState(false);
+    ButtonState pbuttonY = new ButtonState(false);
+    ButtonState pbuttonX = new ButtonState(false);
+    ButtonState pbuttonDPADL = new ButtonState(false);
+    ButtonState pbuttonDPADR = new ButtonState(false);
+    ButtonState pbuttonBACK = new ButtonState(false);
 
     boolean bumpertoggle = false; //true is turn sensitivity, false for drive
 
@@ -84,44 +87,47 @@ public class Robot extends SimpleRobot {
         }
 
     }
-    
+
     public void saysquaredinputs(int line) {
         dsout.say(line, "Squared Inputs: " + SquaredInputs);
     }
-    
-    
+
     String[] drivemodename = {
-        "Arcade", 
-        "Tank", 
-        "Sawyer" };
+        "Arcade",
+        "Tank",
+        "Sawyer"};
 
     public void saydrivemode(int line) {
         dsout.say(line, "Mode: " + drivemodename[DriveMode]);
     }
-    
+
     public void sayscreentele() {
-        
+
         dsout.say(1, fullname);
         saydrivemode(2);
         saysquaredinputs(3);
-        if(DriveMode == 1){
+        if (DriveMode == 1) {
             dsout.clearLine(4);
             dsout.clearLine(5);
-        }else {
-        saydrivesensitivity(4);
-        sayturnsensitivity(5); 
+        } else {
+            saydrivesensitivity(4);
+            sayturnsensitivity(5);
         }
-}
-    
-    public void switchdrivemode(){
-        switch(DriveMode){
-            case 0: DriveMode = 1;
+    }
+
+    public void switchdrivemode() {
+        switch (DriveMode) {
+            case 0:
+                DriveMode = 1;
                 break;
-            case 1: DriveMode = 2;
+            case 1:
+                DriveMode = 2;
                 break;
-            case 2: DriveMode = 0;
+            case 2:
+                DriveMode = 0;
                 break;
-            default: DriveMode = 0;
+            default:
+                DriveMode = 0;
                 break;
         }
     }
@@ -136,7 +142,7 @@ public class Robot extends SimpleRobot {
             dsout.say(2, "Autonomous Mode");
             Timer time = new Timer();
             time.start();
-            while ( time.get() < 1 && isEnabled() && isAutonomous()) {
+            while (time.get() < 1 && isEnabled() && isAutonomous()) {
                 drivetrain.drive(-0.3, 0); //Negative goes forward for some reason
                 dsout.say(3, "Time: " + time.get());
                 Timer.delay(0.01);
@@ -144,6 +150,19 @@ public class Robot extends SimpleRobot {
             time.stop();
             dsout.say(3, "Time: " + time.get() + " DONE");
             time.reset();
+        }
+    }
+
+    public boolean buttoncheck(boolean button, ButtonState pbutton) {
+        if (button) {
+            pbutton.setstate(true);
+            return false;
+        } else if (pbutton.getstate() && !button) {
+            pbutton.setstate(false);
+            return true;
+        } else {
+            pbutton.setstate(false);
+            return false;
         }
     }
 
@@ -161,7 +180,7 @@ public class Robot extends SimpleRobot {
             double spin = 0;
 
             double tankleft = 0;
-            double tankright = 0; 
+            double tankright = 0;
 
             if (DriveMode == 0) {
                 move = (gp.getLeftY() * ((double) (DriveSensitivity) / 100));
@@ -175,10 +194,7 @@ public class Robot extends SimpleRobot {
             }
 
             if (DriveMode != 1) {
-
-                if (gp.getButtonStateRightBumper()) {
-                    pbuttonRB = true;
-                } else if (pbuttonRB && !gp.getButtonStateRightBumper()) {
+                if (buttoncheck(gp.getButtonStateRightBumper(), pbuttonRB)) {
                     if (bumpertoggle) {
                         TurnSensitivity = (TurnSensitivity) + (10);
                         sayscreentele();
@@ -186,12 +202,9 @@ public class Robot extends SimpleRobot {
                         DriveSensitivity = (DriveSensitivity) + (10);
                         sayscreentele();
                     }
-                    pbuttonRB = false;
                 }
 
-                if (gp.getButtonStateLeftBumper()) {
-                    pbuttonLB = true;
-                } else if (pbuttonLB && !gp.getButtonStateLeftBumper()) {
+                if (buttoncheck(gp.getButtonStateLeftBumper(), pbuttonLB)) {
                     if (bumpertoggle) {
                         TurnSensitivity = (TurnSensitivity) - (10);
                         sayscreentele();
@@ -199,56 +212,43 @@ public class Robot extends SimpleRobot {
                         DriveSensitivity = (DriveSensitivity) - (10);
                         sayscreentele();
                     }
-                    pbuttonLB = false;
                 }
 
-                if (gp.getButtonStateY()) {
-                    pbuttonY = true;
-                } else if (pbuttonY && !gp.getButtonStateY()) {
+                if (buttoncheck(gp.getButtonStateY(), pbuttonY)) {
                     bumpertoggle = !bumpertoggle;
                     sayscreentele();
-                    pbuttonY = false;
                 }
-
             }
-            
 
-            if (gp.getButtonStateX()) {
-                pbuttonX = true;
-            } else if (pbuttonX && !gp.getButtonStateX()) {
+            if (buttoncheck(gp.getButtonStateX(), pbuttonX)) {
                 SquaredInputs = !SquaredInputs;
                 sayscreentele();
-                pbuttonX = false;
             }
-            if (gp.getButtonStateBACK()) {
-                pbuttonBACK = true;
-            } else if (pbuttonBACK && !gp.getButtonStateBACK()) {
+
+            if (buttoncheck(gp.getButtonStateBACK(), pbuttonBACK)) {
                 switchdrivemode();
                 sayscreentele();
-                pbuttonBACK = false;
             }
 
             // Drive da robot:
-            if(DriveMode == 1){
+            if (DriveMode == 1) {
                 drivetrain.tankDrive(tankleft, tankright, SquaredInputs);
             } else {
                 drivetrain.arcadeDrive(move, spin, SquaredInputs);
             }
-            
 
             Timer.delay(0.005);
         }
         dsout.clearOutput();
     }
-    
-    protected void disabled(){
-        if(isDisabled()){
+
+    protected void disabled() {
+        if (isDisabled()) {
             dsout.clearOutput();
             dsout.say(1, fullname);
             dsout.say(2, "Robot Disabled");
         }
     }
-    
 
     /**
      * This function is called once each time the robot enters test mode.
