@@ -9,17 +9,17 @@ package com.frc2879.mermaid;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.SimpleRobot;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.camera.AxisCamera;
 
 /**
- * 
+ *
  * @author floogulinc
- * 
- * Robot Code for FRC Team 2879 Orange Thunder
- * COMPETITION BOT - Mermaid
+ *
+ * Robot Code for FRC Team 2879 Orange Thunder COMPETITION BOT - Mermaid
  */
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -29,7 +29,7 @@ import edu.wpi.first.wpilibj.camera.AxisCamera;
  * directory.
  */
 public class Robot extends SimpleRobot {
-    
+
     static final int driveR = 1;
     static final int driveL = 2;
 
@@ -39,7 +39,7 @@ public class Robot extends SimpleRobot {
     GamepadXbox gp = new GamepadXbox(GPport);
 
     public static final String name = "Mermaid Bot";
-    public static final String version = "v1.01";
+    public static final String version = "v1.02";
     public static final String fullname = name + " " + version;
 
     // CONFIG VALUES
@@ -56,18 +56,25 @@ public class Robot extends SimpleRobot {
     static final String acamIP = "10.28.79.11";
 
     static final int pressureSwitchChannel = 1;
-    static final int compressorRelayChannel = 4;
-    
-    static final int kickSolChanfor = 1;
-    static final int kickSolChanrev = 2;
-    static final int armsSolChanfor = 3;
-    static final int armsSolChanrev = 4;
-    
+    static final int compressorRelayChannel = 1;
+
+    static final int kickSolChanfor = 3;
+    static final int kickSolChanrev = 4;
+    static final int armsSolChanfor = 1;
+    static final int armsSolChanrev = 2;
+
     DoubleSolenoid kickSol = new DoubleSolenoid(kickSolChanfor, kickSolChanrev);
     DoubleSolenoid armsSol = new DoubleSolenoid(armsSolChanfor, armsSolChanrev);
     Compressor compressor = new Compressor(pressureSwitchChannel, compressorRelayChannel);
 
-            
+    static final int cameravertchan = 3;
+    static final int camerahorzchan = 4;
+
+    Servo cameravert = new Servo(cameravertchan);
+    Servo camerahorz = new Servo(camerahorzchan);
+    
+
+
     //Called exactly 1 time when the competition starts.
     protected void robotInit() {
         dsout = new DSOutput();
@@ -92,9 +99,10 @@ public class Robot extends SimpleRobot {
     ButtonState pbuttonDPADL = new ButtonState(false);
     ButtonState pbuttonDPADR = new ButtonState(false);
     ButtonState pbuttonBACK = new ButtonState(false);
+    ButtonState pbuttonRT = new ButtonState(false);
+    ButtonState pbuttonLT = new ButtonState(false);
 
     boolean bumpertoggle = false; //true is turn sensitivity, false for drive
-
 
     public void saysensitivity(int line) {
         if (bumpertoggle) {
@@ -117,8 +125,8 @@ public class Robot extends SimpleRobot {
     public void saydrivemode(int line) {
         dsout.say(line, "Mode: " + drivemodename[DriveMode]);
     }
-    
-    public void saysolstates(int line){
+
+    public void saysolstates(int line) {
         dsout.say(line, "Kick: " + solvaluestring(kickSol.get()) + " | Arms: " + solvaluestring(armsSol.get()));
     }
 
@@ -133,16 +141,15 @@ public class Robot extends SimpleRobot {
             saysensitivity(4);
         }
         saysolstates(5);
-        
-        
+
     }
-    
+
     public String solvaluestring(DoubleSolenoid.Value value) {
-        if(value.equals(DoubleSolenoid.Value.kOff)){
+        if (value.equals(DoubleSolenoid.Value.kOff)) {
             return "OFF";
-        } else if(value.equals(DoubleSolenoid.Value.kForward)) {
+        } else if (value.equals(DoubleSolenoid.Value.kForward)) {
             return "FOR";
-        } else if(value.equals(DoubleSolenoid.Value.kReverse)) {
+        } else if (value.equals(DoubleSolenoid.Value.kReverse)) {
             return "REV";
         } else {
             return "null";
@@ -171,6 +178,7 @@ public class Robot extends SimpleRobot {
      */
     public void autonomous() {
         if (isAutonomous()) {
+            resetsol();
             dsout.clearOutput();
             dsout.say(1, fullname);
             dsout.say(2, "Autonomous Mode");
@@ -200,6 +208,12 @@ public class Robot extends SimpleRobot {
         }
     }
 
+    public void resetsol() {
+        armsSol.set(DoubleSolenoid.Value.kReverse);
+        kickSol.set(DoubleSolenoid.Value.kReverse);
+        sayscreentele();
+    }
+
     /**
      * This function is called once each time the robot enters operator control.
      */
@@ -207,6 +221,7 @@ public class Robot extends SimpleRobot {
         drivetrain.setSafetyEnabled(true);
         dsout.clearOutput();
         sayscreentele();
+        resetsol();
         while (isOperatorControl() && isEnabled()) {
 
             // Update joystick values:
@@ -253,9 +268,50 @@ public class Robot extends SimpleRobot {
                     sayscreentele();
                 }
             }
+            
+            //dsout.say(6, Double.toString(gp.getDPadX()));
 
             if (buttoncheck(gp.getButtonStateX(), pbuttonX)) {
                 SquaredInputs = !SquaredInputs;
+                sayscreentele();
+            }
+
+            if (buttoncheck(gp.getButtonStateBACK(), pbuttonBACK)) {
+                switchdrivemode();
+                sayscreentele();
+            }
+
+            if (buttoncheck(gp.getButtonStateRightTrigger(), pbuttonRT)) {
+              //  if (kickSol.get().equals(DoubleSolenoid.Value.kForward)) {
+                //      kickSol.set(DoubleSolenoid.Value.kReverse);
+                // } else if (kickSol.get().equals(DoubleSolenoid.Value.kReverse)) {
+                //      kickSol.set(DoubleSolenoid.Value.kForward);
+                //  } else {
+                //      kickSol.set(DoubleSolenoid.Value.kReverse);
+                //  }
+
+                new Thread() {
+                    public void run() {
+                        kickSol.set(DoubleSolenoid.Value.kForward);
+                        sayscreentele();
+                        Timer.delay(1);
+                        kickSol.set(DoubleSolenoid.Value.kReverse);
+                        sayscreentele();
+                    }
+                }.start();
+                Thread.yield();
+
+                sayscreentele();
+
+            }
+            if (buttoncheck(gp.getButtonStateLeftTrigger(), pbuttonLT)) {
+                if (armsSol.get().equals(DoubleSolenoid.Value.kForward)) {
+                    armsSol.set(DoubleSolenoid.Value.kReverse);
+                } else if (armsSol.get().equals(DoubleSolenoid.Value.kReverse)) {
+                    armsSol.set(DoubleSolenoid.Value.kForward);
+                } else {
+                    armsSol.set(DoubleSolenoid.Value.kReverse);
+                }
                 sayscreentele();
             }
 
@@ -268,12 +324,14 @@ public class Robot extends SimpleRobot {
             if (DriveMode == 1) {
                 drivetrain.tankDrive(tankleft, tankright, SquaredInputs);
             } else {
-                drivetrain.arcadeDrive(move, spin, SquaredInputs);
+                //drivetrain.arcadeDrive(move, spin, SquaredInputs);
+                drivetrain.arcadeDrive(spin, move, SquaredInputs);
             }
 
             Timer.delay(0.005);
         }
         dsout.clearOutput();
+        
     }
 
     protected void disabled() {

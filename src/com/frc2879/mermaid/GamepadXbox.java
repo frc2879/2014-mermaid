@@ -104,6 +104,14 @@ public class GamepadXbox extends XboxController{
     public boolean getButtonStateRightBumper() {
         return getRawButton(Button_RIGHT_BUMPER);
     }
+    
+    public boolean getButtonStateRightTrigger(){
+        return getRawAxis(Axis_TRIGGER)==-1;
+    }
+    
+    public boolean getButtonStateLeftTrigger(){
+        return getRawAxis(Axis_TRIGGER)==1;
+    }
 
 
 
@@ -113,6 +121,8 @@ public class GamepadXbox extends XboxController{
     public double getDPadX() {
         return getRawAxis(Axis_DPAD);
     }
+    
+
 
     
     //Stuff from old logitech class
