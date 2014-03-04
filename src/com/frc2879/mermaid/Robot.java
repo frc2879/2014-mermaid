@@ -39,7 +39,7 @@ public class Robot extends SimpleRobot {
     GamepadXbox gp = new GamepadXbox(GPport);
 
     public static final String name = "Mermaid Bot";
-    public static final String version = "v1.02";
+    public static final String version = "v1.03";
     public static final String fullname = name + " " + version;
 
     // CONFIG VALUES
@@ -103,6 +103,7 @@ public class Robot extends SimpleRobot {
     ButtonState pbuttonLT = new ButtonState(false);
 
     boolean bumpertoggle = false; //true is turn sensitivity, false for drive
+    boolean iskicking = false;
 
     public void saysensitivity(int line) {
         if (bumpertoggle) {
@@ -289,19 +290,22 @@ public class Robot extends SimpleRobot {
                 //  } else {
                 //      kickSol.set(DoubleSolenoid.Value.kReverse);
                 //  }
+                if (iskicking == false) {
+                    new Thread() {
+                        public void run() {
+                            iskicking = true;
+                            kickSol.set(DoubleSolenoid.Value.kForward);
+                            sayscreentele();
+                            Timer.delay(1);
+                            kickSol.set(DoubleSolenoid.Value.kReverse);
+                            sayscreentele();
+                            iskicking = false;
+                        }
+                    }.start();
+                    Thread.yield();
 
-                new Thread() {
-                    public void run() {
-                        kickSol.set(DoubleSolenoid.Value.kForward);
-                        sayscreentele();
-                        Timer.delay(1);
-                        kickSol.set(DoubleSolenoid.Value.kReverse);
-                        sayscreentele();
-                    }
-                }.start();
-                Thread.yield();
-
-                sayscreentele();
+                    sayscreentele();
+                }
 
             }
             if (buttoncheck(gp.getButtonStateLeftTrigger(), pbuttonLT)) {
