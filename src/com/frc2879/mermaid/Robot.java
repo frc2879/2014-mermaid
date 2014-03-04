@@ -38,8 +38,8 @@ public class Robot extends SimpleRobot {
     static final int GPport = 1;
     GamepadXbox gp = new GamepadXbox(GPport);
 
-    public static final String name = "Mermaid Bot";
-    public static final String version = "v1.03";
+    public static final String name = "Mermaid";
+    public static final String version = "C.2014.103";
     public static final String fullname = name + " " + version;
 
     // CONFIG VALUES
