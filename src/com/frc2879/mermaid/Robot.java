@@ -39,7 +39,7 @@ public class Robot extends SimpleRobot {
     GamepadXbox gp = new GamepadXbox(GPport);
 
     public static final String name = "Mermaid";
-    public static final String version = "C.2014.103";
+    public static final String version = "C.2014.104";
     public static final String fullname = name + " " + version;
 
     // CONFIG VALUES
@@ -328,8 +328,8 @@ public class Robot extends SimpleRobot {
             if (DriveMode == 1) {
                 drivetrain.tankDrive(tankleft, tankright, SquaredInputs);
             } else {
-                //drivetrain.arcadeDrive(move, spin, SquaredInputs);
-                drivetrain.arcadeDrive(spin, move, SquaredInputs);
+                drivetrain.arcadeDrive(move, spin, SquaredInputs);
+                //drivetrain.arcadeDrive(spin, move, SquaredInputs); works on mermaid for some reason
             }
 
             Timer.delay(0.005);
