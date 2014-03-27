@@ -39,13 +39,15 @@ public class Robot extends SimpleRobot {
     GamepadXbox gp = new GamepadXbox(GPport);
 
     public static final String name = "Mermaid";
-    public static final String version = "C.2014.104";
+    public static final String version = "C.2014.200";
     public static final String fullname = name + " " + version;
 
     // CONFIG VALUES
     int DriveSensitivity = 100;
     int TurnSensitivity = 100;
     boolean SquaredInputs = true;
+
+
 
     //boolean sawyerdrive = false;
     int DriveMode = 0; // 0 is arcade, 1 is tank, 2 is sawyer
@@ -72,8 +74,6 @@ public class Robot extends SimpleRobot {
 
     Servo cameravert = new Servo(cameravertchan);
     Servo camerahorz = new Servo(camerahorzchan);
-    
-
 
     //Called exactly 1 time when the competition starts.
     protected void robotInit() {
@@ -178,22 +178,24 @@ public class Robot extends SimpleRobot {
      * This function is called once each time the robot enters autonomous mode.
      */
     public void autonomous() {
-        if (isAutonomous()) {
-            resetsol();
-            dsout.clearOutput();
-            dsout.say(1, fullname);
-            dsout.say(2, "Autonomous Mode");
-            Timer time = new Timer();
-            time.start();
-            while (time.get() < 1 && isEnabled() && isAutonomous()) {
-                drivetrain.drive(-0.3, 0); //Negative goes forward for some reason
-                dsout.say(3, "Time: " + time.get());
-                Timer.delay(0.01);
-            }
-            time.stop();
-            dsout.say(3, "Time: " + time.get() + " DONE");
-            time.reset();
+        drivetrain.setSafetyEnabled(true);
+
+        resetsol();
+        dsout.clearOutput();
+        dsout.say(1, fullname);
+        dsout.say(2, "Autonomous Mode");
+        Timer time = new Timer();
+        time.start();
+
+        while (time.get() < 1 && isEnabled() && isAutonomous()) {
+            drivetrain.drive(-0.3, 0); //Negative goes forward for some reason
+            dsout.say(3, "Time: " + time.get());
+            Timer.delay(0.01);
         }
+
+        time.stop();
+        dsout.say(3, "Time: " + time.get() + " DONE");
+        time.reset();
     }
 
     public boolean buttoncheck(boolean button, ButtonState pbutton) {
@@ -269,9 +271,8 @@ public class Robot extends SimpleRobot {
                     sayscreentele();
                 }
             }
-            
-            //dsout.say(6, Double.toString(gp.getDPadX()));
 
+            //dsout.say(6, Double.toString(gp.getDPadX()));
             if (buttoncheck(gp.getButtonStateX(), pbuttonX)) {
                 SquaredInputs = !SquaredInputs;
                 sayscreentele();
@@ -283,7 +284,7 @@ public class Robot extends SimpleRobot {
             }
 
             if (buttoncheck(gp.getButtonStateRightTrigger(), pbuttonRT)) {
-              //  if (kickSol.get().equals(DoubleSolenoid.Value.kForward)) {
+                //  if (kickSol.get().equals(DoubleSolenoid.Value.kForward)) {
                 //      kickSol.set(DoubleSolenoid.Value.kReverse);
                 // } else if (kickSol.get().equals(DoubleSolenoid.Value.kReverse)) {
                 //      kickSol.set(DoubleSolenoid.Value.kForward);
@@ -328,14 +329,14 @@ public class Robot extends SimpleRobot {
             if (DriveMode == 1) {
                 drivetrain.tankDrive(tankleft, tankright, SquaredInputs);
             } else {
-                drivetrain.arcadeDrive(move, spin, SquaredInputs);
-                //drivetrain.arcadeDrive(spin, move, SquaredInputs); works on mermaid for some reason
+                //  drivetrain.arcadeDrive(move, spin, SquaredInputs);
+                drivetrain.arcadeDrive(spin, move, SquaredInputs);// works on mermaid for some reason
             }
 
             Timer.delay(0.005);
         }
         dsout.clearOutput();
-        
+
     }
 
     protected void disabled() {
